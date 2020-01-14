@@ -9,6 +9,8 @@
   <!-- LINK STYLESHEETS -->
   <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <!-- FAVICON -->
+  <link rel="shortcut icon" type="img/icon" href="/favicon.ico">
 </head>
 
 <body>
@@ -17,8 +19,9 @@
     <h3 class="subtitle">Online real-time battleship game</h3>
   </div>
   <table class="board"></table> 
-  </table>
-
+  <div class="controls">
+    <button class="toggle-orientation">Toggle Orientation</button>
+  </div>
   <!-- JS IMPORTS -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="/jquery/jquery.min.js"></script>

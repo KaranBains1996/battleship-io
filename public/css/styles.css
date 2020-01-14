@@ -46,7 +46,7 @@ td {
   width: 60px;
 }
 
-.tile:hover {
+.hover-place {
   background-color: #ededed;
 }
 
@@ -54,6 +54,11 @@ td {
   background-color: red;
 }
 
-.miss {
-  background-color: grey;
+.placed {
+  background-color: #808080;
+}
+
+.controls {
+  text-align: center;
+  margin: 30px 0;
 }
