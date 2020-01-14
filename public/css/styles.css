@@ -1,0 +1,59 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+body {
+  background: #74ebd5;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #ACB6E5, #74ebd5);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #ACB6E5, #74ebd5);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.header {
+  width: 100%;
+  text-align: center;
+  margin: 30px 0;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+table,
+th,
+td {
+  border: 2px solid black;
+}
+
+.board {
+  height: 600px;
+  width: 600px;
+  border: 3px solid white;
+  margin: auto;
+  cursor: pointer;
+  text-align: center;
+}
+
+.tile {
+  height: 60px;
+  width: 60px;
+}
+
+.tile:hover {
+  background-color: #ededed;
+}
+
+.hit {
+  background-color: red;
+}
+
+.miss {
+  background-color: grey;
+}

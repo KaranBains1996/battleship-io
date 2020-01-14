@@ -9,14 +9,17 @@ app.use('/jquery', express.static(path.join(__dirname, 'node_modules', 'jquery',
 app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
 app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-io.on('connection', function(socket){
-  console.log('a user connected');
+io.on('connection', socket => {
+  console.log('user ' + socket.id + ' connected');
+  socket.on('disconnect', () => {
+    console.log('user ' + socket.id + ' disconnected');
+  });
 });
 
-http.listen(3000, function () {
-  console.log('listening on *:3000');
+http.listen(3000, () => {
+  console.log('listening on 127.0.0.1:3000');
 });
