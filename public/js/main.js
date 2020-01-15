@@ -3,29 +3,34 @@ $(() => {
   const boardState = initBoardState();
   const SHIPS = [
     {
+      index: 0,
       name: 'Patrol Boat',
       size: 2
     },
     {
+      index: 1,
       name: 'Submarine',
       size: 3
     },
     {
+      index: 2,
       name: 'Destroyer',
       size: 3
     },
     {
+      index: 3,
       name: 'Battleship',
       size: 4
     },
     {
+      index: 4,
       name: 'Aircraft Carrier',
       size: 5
     },
   ];
+  let currentShip = null;
   let orientation = 'horizontal';
   let placeable = false;
-  let currentShip = SHIPS[1];
 
   renderBoard();
 
@@ -49,26 +54,61 @@ $(() => {
     }
   }
 
+  function checkIfPlaceable(axis, size, offAxis) {
+    if (!(axis <= (10 - size))) {
+      return false;
+    }
+
+    for (let i = axis; i < (axis + size); i += 1) {
+      if (orientation === 'vertical') {
+        if ($(`.tile[data-pos="${i},${offAxis}"]`).hasClass('placed')) {
+          return false;
+        }
+      } else if (orientation === 'horizontal') {
+        if ($(`.tile[data-pos="${offAxis},${i}"]`).hasClass('placed')) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  function toggleOrientation() {
+    if (orientation === 'horizontal') {
+      orientation = 'vertical';
+    } else if (orientation === 'vertical') {
+      orientation = 'horizontal';
+    }
+  }
+
   /**
    * TILE CLICK HANDLER
    */
   $('.tile').on('click', e => {
-    debugger;
-    const tile = $(e.currentTarget);
-    const pos = tile.data('pos').split(',');
-    const x = parseInt(pos[0]);
-    const y = parseInt(pos[1]);
-    if (placeable) {
-      if (orientation === 'vertical') {
-        // place ship on hovered tiles
-        for (let i = x; i < (x + currentShip.size); i += 1) {
-          $(`.tile[data-pos="${i},${y}"]`).addClass('placed');
+    if (currentShip) {
+      const tile = $(e.currentTarget);
+      const pos = tile.data('pos').split(',');
+      const x = parseInt(pos[0]);
+      const y = parseInt(pos[1]);
+      if (placeable) {
+        if (orientation === 'vertical') {
+          // place ship on hovered tiles
+          for (let i = x; i < (x + currentShip.size); i += 1) {
+            $(`.tile[data-pos="${i},${y}"]`).addClass('placed');
+            boardState[i][y] = 1;
+          }
+        } else if (orientation === 'horizontal') {
+          // place ship on hovered tiles
+          for (let i = y; i < (y + currentShip.size); i += 1) {
+            $(`.tile[data-pos="${x},${i}"]`).addClass('placed');
+            boardState[x][i] = 1;
+          }
         }
-      } else if (orientation === 'horizontal') {
-        // place ship on hovered tiles
-        for (let i = y; i < (y + currentShip.size); i += 1) {
-          $(`.tile[data-pos="${x},${i}"]`).addClass('placed');
-        }
+        $(`.ships button[data-index="${currentShip.index}"]`).prop('disabled', true);
+        currentShip = null;
+
+        console.log(boardState);
       }
     }
   });
@@ -79,34 +119,34 @@ $(() => {
   $('.tile').hover(
     // mouseenter event handler
     e => {
-      const tile = $(e.currentTarget);
-      const pos = tile.data('pos').split(',');
-      const x = parseInt(pos[0]);
-      const y = parseInt(pos[1]);
-      if (orientation === 'vertical') {
-        // check if ship is placeable in current tile
-        if (x <= (10 - currentShip.size)) {
-          placeable = true;
-        } else {
-          placeable = false;
-        }
-        if (placeable) {
-          // highlight placeable tiles
-          for (let i = x; i < (x + currentShip.size); i += 1) {
-            $(`.tile[data-pos="${i},${y}"]`).addClass('hover-place');
+      if (currentShip) {
+        const tile = $(e.currentTarget);
+        const pos = tile.data('pos').split(',');
+        const x = parseInt(pos[0]);
+        const y = parseInt(pos[1]);
+        if (orientation === 'vertical') {
+          // check if ship is placeable in current tile
+          placeable = checkIfPlaceable(x, currentShip.size, y);
+
+          if (placeable) {
+            // highlight placeable tiles
+            for (let i = x; i < (x + currentShip.size); i += 1) {
+              $(`.tile[data-pos="${i},${y}"]`).addClass('hover-place');
+            }
+          } else {
+            tile.addClass('not-placeable');
           }
-        }
-      } else if (orientation === 'horizontal') {
-        // check if ship is placeable in current tile
-        if (y <= (10 - currentShip.size)) {
-          placeable = true;
-        } else {
-          placeable = false;
-        }
-        if (placeable) {
-          // highlight placeable tiles
-          for (let i = y; i < (y + currentShip.size); i += 1) {
-            $(`.tile[data-pos="${x},${i}"]`).addClass('hover-place');
+        } else if (orientation === 'horizontal') {
+          // check if ship is placeable in current tile
+          placeable = checkIfPlaceable(y, currentShip.size, x);
+
+          if (placeable) {
+            // highlight placeable tiles
+            for (let i = y; i < (y + currentShip.size); i += 1) {
+              $(`.tile[data-pos="${x},${i}"]`).addClass('hover-place');
+            }
+          } else {
+            tile.addClass('not-placeable');
           }
         }
       }
@@ -114,16 +154,32 @@ $(() => {
     // mouseleave event handler
     () => {
       $('.tile').removeClass('hover-place');
-    });
+      $('.tile').removeClass('not-placeable');
+    }
+  );
+
+  /**
+   * TOGGLE ORIENTATION ON RIGHT CLICK
+   */
+  $(document).on('contextmenu', e => {
+    e.preventDefault();
+    toggleOrientation();
+  });
 
   /**
    * TOGGLE ORIENTATION BUTTON HANDLER
    */
-  $('.toggle-orientation').on('click', () => {
-    if (orientation === 'horizontal') {
-      orientation = 'vertical';
-    } else if (orientation === 'vertical') {
-      orientation = 'horizontal';
-    }
+  $('.toggle-orientation').on('click', toggleOrientation);
+
+  /**
+   * SHIPS BUTTON GROUP CLICK HANDLER
+   */
+  $('.ships button').on('click', e => {
+    $('.ships button').removeClass('active-btn');
+    const btn = $(e.currentTarget);
+    const shipIndex = parseInt(btn.data('index'));
+    currentShip = SHIPS[shipIndex];
+    btn.addClass('active-btn');
   });
+
 });

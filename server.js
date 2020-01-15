@@ -6,7 +6,6 @@ const path = require('path');
 const favicon = require('serve-favicon')
 
 // set up static routes
-app.use('/jquery', express.static(path.join(__dirname, 'node_modules', 'jquery', 'dist')));
 app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
 app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
 app.use(favicon(path.join(__dirname, 'public', 'assets', 'favicons', 'favicon.ico')))

@@ -44,6 +44,7 @@ td {
 .tile {
   height: 60px;
   width: 60px;
+  cursor: pointer;
 }
 
 .hover-place {
@@ -58,7 +59,15 @@ td {
   background-color: #808080;
 }
 
+.not-placeable {
+  cursor: not-allowed;
+}
+
 .controls {
   text-align: center;
   margin: 30px 0;
+}
+
+.active-btn {
+  background-color: #1f56ad;
 }
