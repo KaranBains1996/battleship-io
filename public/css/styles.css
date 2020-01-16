@@ -15,10 +15,14 @@ body {
 
 }
 
-.header {
-  width: 100%;
+.jumbotron {
+  background-color: transparent;
   text-align: center;
-  margin: 30px 0;
+  padding: 20px 0;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 table {
@@ -33,8 +37,8 @@ td {
 }
 
 .board {
-  height: 600px;
-  width: 600px;
+  height: 400px;
+  width: 400px;
   border: 3px solid white;
   margin: auto;
   cursor: pointer;
@@ -42,9 +46,27 @@ td {
 }
 
 .tile {
-  height: 60px;
-  width: 60px;
+  height: 40px;
+  width: 40px;
   cursor: pointer;
+}
+
+.enemy-board {
+  height: 400px;
+  width: 400px;
+  border: 3px solid white;
+  margin: auto;
+  text-align: center;
+}
+
+.enemy-tile {
+  height: 40px;
+  width: 40px;
+  cursor: crosshair;
+}
+
+.enemy-tile:hover {
+  background-color: salmon;
 }
 
 .hover-place {
@@ -70,4 +92,21 @@ td {
 
 .active-btn {
   background-color: #1f56ad;
+}
+
+.ready-ctn {
+  height: 400px;
+  width: 400px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ships {
+  margin-top: 5px;
+}
+
+.ready-err {
+  display: none;
 }

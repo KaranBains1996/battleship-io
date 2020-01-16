@@ -5,34 +5,39 @@ $(() => {
     {
       index: 0,
       name: 'Patrol Boat',
-      size: 2
+      size: 2,
+      placed: false
     },
     {
       index: 1,
       name: 'Submarine',
-      size: 3
+      size: 3,
+      placed: false
     },
     {
       index: 2,
       name: 'Destroyer',
-      size: 3
+      size: 3,
+      placed: false
     },
     {
       index: 3,
       name: 'Battleship',
-      size: 4
+      size: 4,
+      placed: false
     },
     {
       index: 4,
       name: 'Aircraft Carrier',
-      size: 5
+      size: 5,
+      placed: false
     },
   ];
   let currentShip = null;
   let orientation = 'horizontal';
   let placeable = false;
 
-  renderBoard();
+  renderBoard('board', 'tile');
 
   function initBoardState() {
     const boardState = {};
@@ -43,18 +48,18 @@ $(() => {
     return boardState;
   }
 
-  function renderBoard() {
+  function renderBoard(boardClass, tileClass) {
     for (let i = 0; i < 10; i += 1) {
       let rowHTML = '<tr>';
       for (let j = 0; j < 10; j += 1) {
-        rowHTML += `<td class="tile" data-pos="${i},${j}"></td>`
+        rowHTML += `<td class="${tileClass}" data-pos="${i},${j}"></td>`
       }
       rowHTML += '</tr>'
-      $('.board').append(rowHTML);
+      $(`.${boardClass}`).append(rowHTML);
     }
   }
 
-  function checkIfPlaceable(axis, size, offAxis) {
+  function isPlaceable(axis, size, offAxis) {
     if (!(axis <= (10 - size))) {
       return false;
     }
@@ -82,6 +87,30 @@ $(() => {
     }
   }
 
+  function resetReadyBtn() {
+    const btn = $('.ready-btn');
+    btn.find('.spinner-border').addClass('d-none');
+    btn.find('.text').text('Ready');
+    btn.prop('disabled', false);
+  }
+
+  function allShipsPlaced() {
+    for (const ship of SHIPS) {
+      if (!ship.placed) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function showNotReadyError() {
+    $('.ready-err').fadeIn();
+    setTimeout(() => {
+      $('.ready-err').fadeOut();
+    }, 5000);
+  }
+
   /**
    * TILE CLICK HANDLER
    */
@@ -106,9 +135,8 @@ $(() => {
           }
         }
         $(`.ships button[data-index="${currentShip.index}"]`).prop('disabled', true);
+        SHIPS[currentShip.index].placed = true;
         currentShip = null;
-
-        console.log(boardState);
       }
     }
   });
@@ -126,7 +154,7 @@ $(() => {
         const y = parseInt(pos[1]);
         if (orientation === 'vertical') {
           // check if ship is placeable in current tile
-          placeable = checkIfPlaceable(x, currentShip.size, y);
+          placeable = isPlaceable(x, currentShip.size, y);
 
           if (placeable) {
             // highlight placeable tiles
@@ -138,7 +166,7 @@ $(() => {
           }
         } else if (orientation === 'horizontal') {
           // check if ship is placeable in current tile
-          placeable = checkIfPlaceable(y, currentShip.size, x);
+          placeable = isPlaceable(y, currentShip.size, x);
 
           if (placeable) {
             // highlight placeable tiles
@@ -180,6 +208,27 @@ $(() => {
     const shipIndex = parseInt(btn.data('index'));
     currentShip = SHIPS[shipIndex];
     btn.addClass('active-btn');
+  });
+
+  /**
+   * READT BUTTON CLICK HANDLER
+   */
+  $('.ready-btn').on('click', e => {
+    const isReady = allShipsPlaced();
+    if (isReady) {
+      const btn = $(e.currentTarget);
+      btn.find('.spinner-border').removeClass('d-none');
+      btn.find('.text').text('Loading...');
+      btn.prop('disabled', true);
+      setTimeout(() => {
+        enemyBoard = $('.enemy-board');
+        enemyBoard.removeClass('d-none');
+        $('.ready-ctn').addClass('d-none');
+        renderBoard('enemy-board', 'enemy-tile')
+      }, 3000);
+    } else {
+      showNotReadyError();
+    }
   });
 
 });
