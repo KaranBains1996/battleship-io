@@ -1,5 +1,11 @@
 $(() => {
-  const socket = io();
+  // let socket;
+  const socket = io({
+    query: {
+      username: `GUEST#${Math.floor(Math.random()*(999-100+1)+100)}`,
+    }
+  });
+
   const boardState = initBoardState();
   const SHIPS = [
     {
@@ -36,6 +42,8 @@ $(() => {
   let currentShip = null;
   let orientation = 'horizontal';
   let placeable = false;
+
+  let opponent = {};
 
   renderBoard('board', 'tile');
 
@@ -104,12 +112,49 @@ $(() => {
     return true;
   }
 
+  function addBtnLoadingUI(btn) {
+    btn.find('.spinner-border').removeClass('d-none');
+    btn.find('.text').text('Loading...');
+    btn.prop('disabled', true);
+  }
+
+  function initEnemy() {
+    enemyBoard = $('.enemy-board');
+    enemyBoard.removeClass('d-none');
+    $('.ready-ctn').addClass('d-none');
+    renderBoard('enemy-board', 'enemy-tile');
+  }
+
   function showNotReadyError() {
     $('.ready-err').fadeIn();
     setTimeout(() => {
       $('.ready-err').fadeOut();
     }, 5000);
   }
+
+  function connectToServer() {
+    // socket = io({
+    //   query: {
+    //     username: 'Karan',
+    //   }
+    // });
+    lookForPlayers();
+  }
+
+  function lookForPlayers() {
+    socket.emit('look for players', boardState);
+  }
+
+  /**
+   * OPPONENT FOUND SOCKET EVENT HANDLER
+   */
+  socket.on('opponent found', opponent => {
+    console.log('OPPONENT:');
+    console.log(opponent);
+    resetReadyBtn();
+    initEnemy();
+    opponent = opponent;
+  });
 
   /**
    * TILE CLICK HANDLER
@@ -217,15 +262,8 @@ $(() => {
     const isReady = allShipsPlaced();
     if (isReady) {
       const btn = $(e.currentTarget);
-      btn.find('.spinner-border').removeClass('d-none');
-      btn.find('.text').text('Loading...');
-      btn.prop('disabled', true);
-      setTimeout(() => {
-        enemyBoard = $('.enemy-board');
-        enemyBoard.removeClass('d-none');
-        $('.ready-ctn').addClass('d-none');
-        renderBoard('enemy-board', 'enemy-tile')
-      }, 3000);
+      addBtnLoadingUI(btn);
+      connectToServer();
     } else {
       showNotReadyError();
     }
